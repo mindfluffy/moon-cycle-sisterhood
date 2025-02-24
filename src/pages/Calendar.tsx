@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Moon, ChevronLeft, ChevronRight, Star, Droplet } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -10,35 +11,21 @@ const Calendar = () => {
   const [moonPhaseUrl, setMoonPhaseUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMoonImages = async () => {
+    const fetchMoonImage = async () => {
       try {
-        const { data: rootFiles } = await supabase
+        const { data: { publicUrl } } = await supabase
           .storage
           .from('images')
-          .list('', {
-            limit: 10,
-          });
+          .getPublicUrl('nouvelle-lune.jpg');
 
-        console.log('Files in root:', rootFiles);
-
-        if (rootFiles) {
-          const firstImage = rootFiles[0];
-          if (firstImage) {
-            const { data: { publicUrl } } = await supabase
-              .storage
-              .from('images')
-              .getPublicUrl(firstImage.name);
-
-            setMoonPhaseUrl(publicUrl);
-            console.log('Moon image URL:', publicUrl);
-          }
-        }
+        setMoonPhaseUrl(publicUrl);
+        console.log('Moon image URL:', publicUrl);
       } catch (error) {
         console.error('Error:', error);
       }
     };
 
-    fetchMoonImages();
+    fetchMoonImage();
   }, []);
 
   return (
