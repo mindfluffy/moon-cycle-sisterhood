@@ -12,10 +12,11 @@ const Index = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('${fullMoonUrl}')`,
+          backgroundSize: '80%', // Réduction de la taille de l'image
         }}
       >
         {/* Overlay pour assurer la lisibilité du texte */}
-        <div className="absolute inset-0 bg-night-800/30 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-night-800/40 backdrop-blur-[2px]"></div>
       </div>
 
       {/* Contenu centré */}
