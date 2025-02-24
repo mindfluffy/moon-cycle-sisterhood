@@ -4,6 +4,7 @@ import { Moon, ChevronLeft, ChevronRight, Star, Droplet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 // Types pour les phases lunaires
 type MoonPhase = {
@@ -16,6 +17,7 @@ const Calendar = () => {
   const currentMonth = "Mai 2024";
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const [moonPhases, setMoonPhases] = useState<Record<number, string>>({});
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   // Configuration des phases lunaires pour Mai 2024
   // Source : https://www.calendrier-lunaire.fr/
@@ -122,6 +124,7 @@ const Calendar = () => {
               <div
                 key={day}
                 className="aspect-square rounded-lg border border-white/10 p-2 hover:bg-white/5 transition-colors cursor-pointer relative"
+                onClick={() => setSelectedDay(day)}
               >
                 <div className="text-sm text-silver-300 mb-2">{day}</div>
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -155,6 +158,30 @@ const Calendar = () => {
           </div>
         </div>
       </div>
+
+      <Sheet open={selectedDay !== null} onOpenChange={() => setSelectedDay(null)}>
+        <SheetContent className="bg-gradient-to-br from-night-800 via-night-700 to-night-800 border-none">
+          <SheetHeader>
+            <SheetTitle className="text-cream-100">
+              {selectedDay && `${selectedDay} ${currentMonth}`}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col items-center justify-center mt-8">
+            {selectedDay && moonPhases[selectedDay] && (
+              <>
+                <img 
+                  src={moonPhases[selectedDay]} 
+                  alt="Phase lunaire"
+                  className="w-32 h-32 object-contain mb-4"
+                />
+                <p className="text-silver-200 text-lg font-medium">
+                  {getMoonPhaseForDay(selectedDay).name}
+                </p>
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
