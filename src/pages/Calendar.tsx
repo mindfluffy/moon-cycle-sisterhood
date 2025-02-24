@@ -20,15 +20,26 @@ const Calendar = () => {
   // Configuration des phases lunaires pour Mai 2024
   // Source : https://www.calendrier-lunaire.fr/
   const lunarPhases: MoonPhase[] = [
+    { name: "Dernier Croissant", image: "dernier-croissant.jpg", startDay: 4 },
     { name: "Nouvelle Lune", image: "nouvelle-lune.jpg", startDay: 8 },
     { name: "Premier Croissant", image: "premier-croissant.jpg", startDay: 11 },
     { name: "Premier Quartier", image: "premier-quartier.jpg", startDay: 15 },
     { name: "Lune Gibbeuse Croissante", image: "gibbeuse-croissante.jpg", startDay: 18 },
     { name: "Pleine Lune", image: "pleine-lune.jpg", startDay: 23 },
     { name: "Lune Gibbeuse Décroissante", image: "gibbeuse-decroissante.jpg", startDay: 26 },
-    { name: "Dernier Quartier", image: "dernier-quartier.jpg", startDay: 30 },
-    { name: "Dernier Croissant", image: "dernier-croissant.jpg", startDay: 4 }
+    { name: "Dernier Quartier", image: "dernier-quartier.jpg", startDay: 30 }
   ];
+
+  const getMoonPhaseForDay = (day: number): MoonPhase => {
+    // Parcourir les phases dans l'ordre inverse pour trouver la phase active
+    for (let i = lunarPhases.length - 1; i >= 0; i--) {
+      if (day >= lunarPhases[i].startDay) {
+        return lunarPhases[i];
+      }
+    }
+    // Si le jour est avant la première phase du mois, utiliser le dernier croissant
+    return lunarPhases[0];
+  };
 
   useEffect(() => {
     const fetchMoonPhases = async () => {
@@ -37,12 +48,8 @@ const Calendar = () => {
         
         // Pour chaque jour du mois
         for (let day = 1; day <= 31; day++) {
-          // Trouver la phase lunaire appropriée pour ce jour
-          const currentPhase = lunarPhases.reduce((prev, curr) => {
-            if (day >= curr.startDay) return curr;
-            return prev;
-          }, lunarPhases[lunarPhases.length - 1]);
-
+          const currentPhase = getMoonPhaseForDay(day);
+          
           // Obtenir l'URL publique de l'image
           const { data: { publicUrl } } = await supabase
             .storage
@@ -114,15 +121,16 @@ const Calendar = () => {
             {days.map((day) => (
               <div
                 key={day}
-                className="aspect-square rounded-lg border border-white/10 p-2 hover:bg-white/5 transition-colors cursor-pointer relative group"
+                className="aspect-square rounded-lg border border-white/10 p-2 hover:bg-white/5 transition-colors cursor-pointer relative"
               >
-                <div className="text-sm text-silver-300">{day}</div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="text-sm text-silver-300 mb-2">{day}</div>
+                <div className="absolute inset-0 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-1">
                     {moonPhases[day] ? (
                       <img 
                         src={moonPhases[day]} 
                         alt="Phase lunaire"
+                        title={getMoonPhaseForDay(day).name}
                         className="w-6 h-6 object-contain"
                       />
                     ) : (
