@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 const Calendar = () => {
   const currentMonth = "Mai 2024";
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
-  const [moonImages, setMoonImages] = useState<{ [key: string]: string }>({});
+  const [moonPhaseUrl, setMoonPhaseUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMoonImages = async () => {
@@ -16,9 +16,20 @@ const Calendar = () => {
         const { data } = await supabase
           .storage
           .from('images')
-          .getPublicUrl('moon-phases');
+          .list('moon-phases', {
+            limit: 1,
+            offset: 0,
+          });
 
-        console.log('Moon images URL:', data.publicUrl);
+        if (data && data[0]) {
+          const { data: { publicUrl } } = await supabase
+            .storage
+            .from('images')
+            .getPublicUrl(`moon-phases/${data[0].name}`);
+
+          setMoonPhaseUrl(publicUrl);
+          console.log('Moon image URL:', publicUrl);
+        }
       } catch (error) {
         console.error('Error:', error);
       }
@@ -85,7 +96,15 @@ const Calendar = () => {
                 <div className="text-sm text-silver-300">{day}</div>
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex flex-col items-center gap-1">
-                    <Moon className="w-4 h-4 text-silver-400" />
+                    {moonPhaseUrl ? (
+                      <img 
+                        src={moonPhaseUrl} 
+                        alt="Phase lunaire"
+                        className="w-6 h-6 object-contain"
+                      />
+                    ) : (
+                      <Moon className="w-4 h-4 text-silver-400" />
+                    )}
                     {day % 7 === 0 && <Droplet className="w-4 h-4 text-rose-300" />}
                   </div>
                 </div>
@@ -99,7 +118,15 @@ const Calendar = () => {
               <span className="text-sm text-silver-300">Règles</span>
             </div>
             <div className="flex items-center gap-2">
-              <Moon className="w-4 h-4 text-silver-400" />
+              {moonPhaseUrl ? (
+                <img 
+                  src={moonPhaseUrl} 
+                  alt="Phase lunaire"
+                  className="w-4 h-4 object-contain"
+                />
+              ) : (
+                <Moon className="w-4 h-4 text-silver-400" />
+              )}
               <span className="text-sm text-silver-300">Phase lunaire</span>
             </div>
           </div>
