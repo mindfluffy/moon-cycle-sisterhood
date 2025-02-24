@@ -2,10 +2,35 @@
 import { Button } from "@/components/ui/button";
 import { Moon, ChevronLeft, ChevronRight, Star, Droplet } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const Calendar = () => {
   const currentMonth = "Mai 2024";
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const [moonImages, setMoonImages] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    const fetchMoonImages = async () => {
+      try {
+        const { data: { publicUrl }, error } = await supabase
+          .storage
+          .from('images')
+          .getPublicUrl('moon-phases');
+
+        if (error) {
+          console.error('Error fetching moon images:', error);
+          return;
+        }
+
+        console.log('Moon images URL:', publicUrl);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchMoonImages();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-night-800 via-night-700 to-night-800 relative">
@@ -34,7 +59,7 @@ const Calendar = () => {
             </Button>
           </Link>
           <h1 className="text-2xl font-playfair font-bold text-cream-100">Calendrier Lunaire</h1>
-          <div className="w-20" /> {/* Spacer pour centrer le titre */}
+          <div className="w-20" />
         </div>
 
         <div className="glass-card rounded-xl p-6">
