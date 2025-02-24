@@ -7,6 +7,28 @@ const Calendar = () => {
   const currentMonth = "Mai 2024";
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
+  // Fonction pour déterminer la phase lunaire (exemple simplifié)
+  const getMoonPhase = (day: number) => {
+    if (day === 1 || day === 29) return "new"; // Nouvelle lune
+    if (day === 8 || day === 22) return "half"; // Premier/Dernier quartier
+    if (day === 15) return "full"; // Pleine lune
+    return "default";
+  };
+
+  // Fonction pour afficher l'icône de la phase lunaire
+  const renderMoonPhase = (phase: string) => {
+    switch (phase) {
+      case "new":
+        return <Moon className="w-4 h-4 text-silver-400" strokeWidth={3} />;
+      case "half":
+        return <Moon className="w-4 h-4 text-silver-400" strokeWidth={2} />;
+      case "full":
+        return <Moon className="w-4 h-4 text-silver-200" fill="currentColor" />;
+      default:
+        return <Moon className="w-4 h-4 text-silver-400/50" />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-night-800 via-night-700 to-night-800 relative">
       <div className="absolute inset-0">
@@ -60,12 +82,12 @@ const Calendar = () => {
             {days.map((day) => (
               <div
                 key={day}
-                className="aspect-square rounded-lg border border-white/10 p-2 hover:bg-white/5 transition-colors cursor-pointer relative group"
+                className="aspect-square rounded-lg border border-white/10 p-2 hover:bg-white/5 transition-colors cursor-pointer relative"
               >
                 <div className="text-sm text-silver-300">{day}</div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity">
                   <div className="flex flex-col items-center gap-1">
-                    <Moon className="w-4 h-4 text-silver-400" />
+                    {renderMoonPhase(getMoonPhase(day))}
                     {day % 7 === 0 && <Droplet className="w-4 h-4 text-rose-300" />}
                   </div>
                 </div>
