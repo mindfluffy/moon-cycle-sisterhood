@@ -3,13 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Index = () => {
+  const fullMoonUrl = "https://wdpawlpaqqwbnsmylxeq.supabase.co/storage/v1/object/public/images/pleine-lune.jpg";
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Image de fond avec halo */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('/lovable-uploads/27186a43-b162-4913-82c5-a56059b8189a.png')`,
+          backgroundImage: `url('${fullMoonUrl}')`,
         }}
       >
         {/* Overlay pour assurer la lisibilité du texte */}
