@@ -73,12 +73,16 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair;
   }
 }
 
 .glass-card {
-  @apply bg-white/30 backdrop-blur-md border border-white/40 shadow-lg;
+  @apply bg-white/20 backdrop-blur-md border border-white/30 shadow-lg;
 }
 
 .animate-in {
