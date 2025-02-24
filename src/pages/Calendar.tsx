@@ -5,27 +5,60 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
+// Types pour les phases lunaires
+type MoonPhase = {
+  name: string;
+  image: string;
+  startDay: number;
+};
+
 const Calendar = () => {
   const currentMonth = "Mai 2024";
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
-  const [moonPhaseUrl, setMoonPhaseUrl] = useState<string | null>(null);
+  const [moonPhases, setMoonPhases] = useState<Record<number, string>>({});
+
+  // Configuration des phases lunaires pour Mai 2024
+  // Source : https://www.calendrier-lunaire.fr/
+  const lunarPhases: MoonPhase[] = [
+    { name: "Nouvelle Lune", image: "nouvelle-lune.jpg", startDay: 8 },
+    { name: "Premier Croissant", image: "premier-croissant.jpg", startDay: 11 },
+    { name: "Premier Quartier", image: "premier-quartier.jpg", startDay: 15 },
+    { name: "Lune Gibbeuse Croissante", image: "gibbeuse-croissante.jpg", startDay: 18 },
+    { name: "Pleine Lune", image: "pleine-lune.jpg", startDay: 23 },
+    { name: "Lune Gibbeuse Décroissante", image: "gibbeuse-decroissante.jpg", startDay: 26 },
+    { name: "Dernier Quartier", image: "dernier-quartier.jpg", startDay: 30 },
+    { name: "Dernier Croissant", image: "dernier-croissant.jpg", startDay: 4 }
+  ];
 
   useEffect(() => {
-    const fetchMoonImage = async () => {
+    const fetchMoonPhases = async () => {
       try {
-        const { data: { publicUrl } } = await supabase
-          .storage
-          .from('images')
-          .getPublicUrl('nouvelle-lune.jpg');
+        const phaseUrls: Record<number, string> = {};
+        
+        // Pour chaque jour du mois
+        for (let day = 1; day <= 31; day++) {
+          // Trouver la phase lunaire appropriée pour ce jour
+          const currentPhase = lunarPhases.reduce((prev, curr) => {
+            if (day >= curr.startDay) return curr;
+            return prev;
+          }, lunarPhases[lunarPhases.length - 1]);
 
-        setMoonPhaseUrl(publicUrl);
-        console.log('Moon image URL:', publicUrl);
+          // Obtenir l'URL publique de l'image
+          const { data: { publicUrl } } = await supabase
+            .storage
+            .from('images')
+            .getPublicUrl(currentPhase.image);
+
+          phaseUrls[day] = publicUrl;
+        }
+
+        setMoonPhases(phaseUrls);
       } catch (error) {
         console.error('Error:', error);
       }
     };
 
-    fetchMoonImage();
+    fetchMoonPhases();
   }, []);
 
   return (
@@ -86,9 +119,9 @@ const Calendar = () => {
                 <div className="text-sm text-silver-300">{day}</div>
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex flex-col items-center gap-1">
-                    {moonPhaseUrl ? (
+                    {moonPhases[day] ? (
                       <img 
-                        src={moonPhaseUrl} 
+                        src={moonPhases[day]} 
                         alt="Phase lunaire"
                         className="w-6 h-6 object-contain"
                       />
@@ -108,15 +141,7 @@ const Calendar = () => {
               <span className="text-sm text-silver-300">Règles</span>
             </div>
             <div className="flex items-center gap-2">
-              {moonPhaseUrl ? (
-                <img 
-                  src={moonPhaseUrl} 
-                  alt="Phase lunaire"
-                  className="w-4 h-4 object-contain"
-                />
-              ) : (
-                <Moon className="w-4 h-4 text-silver-400" />
-              )}
+              <Moon className="w-4 h-4 text-silver-400" />
               <span className="text-sm text-silver-300">Phase lunaire</span>
             </div>
           </div>
