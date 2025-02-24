@@ -13,17 +13,12 @@ const Calendar = () => {
   useEffect(() => {
     const fetchMoonImages = async () => {
       try {
-        const { data: { publicUrl }, error } = await supabase
+        const { data } = await supabase
           .storage
           .from('images')
           .getPublicUrl('moon-phases');
 
-        if (error) {
-          console.error('Error fetching moon images:', error);
-          return;
-        }
-
-        console.log('Moon images URL:', publicUrl);
+        console.log('Moon images URL:', data.publicUrl);
       } catch (error) {
         console.error('Error:', error);
       }
